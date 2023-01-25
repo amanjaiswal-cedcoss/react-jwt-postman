@@ -1,10 +1,10 @@
 import React from "react";
 import { user } from "../types";
-type IProps={
-    details:user
-}
+type IProps = {
+  details: user;
+};
 
-function Dashboard(props:IProps) {
+function Dashboard(props: IProps) {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container-fluid">
@@ -47,7 +47,6 @@ function Dashboard(props:IProps) {
               Search
             </button>
           </form>
-          
         </div>
       </div>
     </nav>

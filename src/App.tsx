@@ -7,16 +7,19 @@ import { user } from "./types";
 const users: user[] = [
   {
     email: "aman@gmail.com",
+    password: "Aman@1234",
     token:
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtYW5AZ21haWwuY29tIiwicGFzc3dvcmQiOiJBbWFuQDEyMzQiLCJleHAiOjE2Nzk3MDI0MDAsInJvbGUiOiJhZG1pbiJ9.utVkoGEUJdeIulYiX8KEPvgQ6hdci9Wsn1bQIZZWovA",
   },
   {
     email: "deepanshu@gmail.com",
+    password: "deepanshu@1234",
     token:
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRlZXBhbnNodUBnbWFpbC5jb20iLCJwYXNzd29yZCI6ImRlZXBhbnNodUAxMjM0Iiwicm9sZSI6InVzZXIiLCJleHAiOjE2Nzk3MDI0MDB9.S_Cj3r95f64mQZAL3ZwoOJuPR5JPrPQhoUusgNGtAko",
   },
   {
     email: "adarsh@gmail.com",
+    password: "adarsh@1234",
     token:
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkYXJzaEBnbWFpbC5jb20iLCJwYXNzd29yZCI6ImFkYXJzaEAxMjM0Iiwicm9sZSI6InVzZXIiLCJleHAiOjE2Nzk3MDI0MDB9.PnLKq7eZzXI_BNN-P7lCj9y3L20lWLA-KC0VFZfc8F0",
   },
@@ -27,79 +30,71 @@ function App() {
   const refPassword = useRef<HTMLInputElement>(null);
   const [user, setUser] = useState<user>({ email: "", token: "" });
   const [error, setError] = useState("");
-  const {decodedToken,isExpired} = useJwt<user>(user.token);
+  const { decodedToken, isExpired } = useJwt<user>(user.token);
 
-  const checkUser = () => {
+  const login = (e: React.FormEvent<HTMLFormElement>) => {
     let obj = users.find((ele) => {
       return ele.email === refEmail.current?.value;
     });
     if (obj !== undefined) {
-      setUser({...obj});
-      setError("");
+      if (obj.password === refPassword.current!.value) {
+        if (!isExpired) {
+          setError("");
+          setUser(obj);
+        }
+        else{
+          setError("Token expired");
+        }
+      } else {
+        setError("Incorrect Password");
+      }
     } else {
       setError("User does not exist");
-    }
-  };
-  
-  console.log(decodedToken)
-  console.log(isExpired);
-
-  const authenticate = (e: React.FormEvent<HTMLFormElement>) => {
-    if(decodedToken!.password===refPassword.current!.value){
-      setError('')
-      alert('Login Successful!!')
-    }
-    else{
-      setError('Incorrect Password')
     }
   };
 
   return (
     <div className="App">
-      {decodedToken===null?<><form
-        className=" col-10 col-md-4 my-2 mx-auto border p-4 text-start"
-        onSubmit={(e) => {
-          e.preventDefault();
-          user.email !== "" ? authenticate(e) : checkUser();
-        }}
-      >
-        <div className="mb-3">
-          <label className="form-label">Email address</label>
-          <input
-            required
-            ref={refEmail}
-            type="email"
-            className="form-control"
-          />
-        </div>
-        {user.email !== "" ? (
-          <div className="mb-3">
-            <label className="form-label">Password</label>
-            <input
-              required
-              ref={refPassword}
-              type="password"
-              className="form-control"
-            />
-          </div>
-        ) : (
-          ""
-        )}
-        {user.email !== "" ? (
-          <button type="submit" className="btn btn-primary">
-            Submit
-          </button>
-        ) : (
-          <button type="submit" className="btn btn-primary">
-            Check User
-          </button>
-        )}
-      </form>
-      {error !== "" ? (
-        <div className="alert alert-danger d-inline-flex">{error}</div>
+      {decodedToken === null ? (
+        <>
+          <form
+            className=" col-10 col-md-4 my-2 mx-auto border p-4 text-start"
+            onSubmit={(e) => {
+              e.preventDefault();
+              login(e);
+            }}
+          >
+            <div className="mb-3">
+              <label className="form-label">Email address</label>
+              <input
+                required
+                ref={refEmail}
+                type="email"
+                className="form-control"
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Password</label>
+              <input
+                required
+                ref={refPassword}
+                type="password"
+                className="form-control"
+              />
+            </div>
+            <button type="submit" className="btn btn-primary">
+              Submit
+            </button>
+          </form>
+          {error !== "" ? (
+            <div className="alert alert-danger d-inline-flex">{error}</div>
+          ) : (
+            ""
+          )}
+        </>
       ) : (
-        ""
-      )}</>:<Dashboard details={decodedToken}/>}
+        <Dashboard details={decodedToken} />
+      )}
     </div>
   );
 }
